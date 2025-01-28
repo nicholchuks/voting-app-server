@@ -75,7 +75,7 @@ const addElection = async (req, res, next) => {
 const getElections = async (req, res, next) => {
   try {
     const elections = await ElectionModel.find();
-    
+
     res.status(200).json(elections);
   } catch (error) {
     return next(new HttpError(error));
@@ -86,7 +86,13 @@ const getElections = async (req, res, next) => {
 // GET : api/elections/:id
 // PROTECTED
 const getElection = async (req, res, next) => {
-  res.json("Get Single Election");
+  try {
+    const { id } = req.params;
+    const election = await ElectionModel.findById(id);
+    res.status(200).json(election);
+  } catch (error) {
+    return next(new HttpError(error));
+  }
 };
 
 // ......................GET SINGLE ELECTION.....................
