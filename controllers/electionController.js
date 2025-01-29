@@ -188,7 +188,19 @@ const updateElection = async (req, res, next) => {
 // DELETE : api/elections/:id
 // PROTECTED (only admin)
 const removeElection = async (req, res, next) => {
-  res.json("Delete Election");
+  try {
+    //Only admin can add election
+    //   if(!req.user.isAdmin) {
+    //    return next(new HttpError("Only an admin can perform this action.", 403))
+    //  }
+    const { id } = req.params;
+    await ElectionModel.findByIdAndDelete(id);
+    //delete candidates that belong to this election
+    await CandidateModel.deleteMany({ election: id });
+    res.status(200).json("Election deleted successfully");
+  } catch (error) {
+    return next(new HttpError(error));
+  }
 };
 
 module.exports = {
