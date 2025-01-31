@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 
 const ElectionModel = require("../models/electionModel");
 const CandidateModel = require("../models/candidateModel");
+const VoterModel = require("../models/voterModel");
 
 require("dotenv").config();
 
@@ -149,7 +150,39 @@ const removeCandidate = async (req, res, next) => {
 // PARCH : api/elections/:id
 // PROTECTED
 const voteCandidate = async (req, res, next) => {
-  res.json("Vote candidate");
+  try {
+    const { id: candidateId } = req.params;
+    const { selectedElection } = req.body;
+    //get the candidate
+    const candidate = await CandidateModel.findById(candidateId);
+    const newVoteCount = candidate.voteCount + 1;
+
+    //update candidate's votes
+    await CandidateModel.findByIdAndUpdate(
+      candidateId,
+      { voteCount: newVoteCount },
+      { new: true }
+    );
+
+    //start session for relationship for voter and election
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+
+    //get the current voter
+    let voter = await VoterModel.findById(req.user.id);
+    await voter.save({ session: sess });
+
+    //get selected election
+    let election = await ElectionModel.findById(selectedElection);
+    election.voters.push(voter);
+    voter.votedElections.push(election);
+    await election.save({ session: sess });
+    await voter.save({ session: sess });
+    await sess.commitTransaction();
+    res.status(200).json("Vote casted successfully.");
+  } catch (error) {
+    return next(new HttpError(error));
+  }
 };
 
 module.exports = { addCandidate, getCandidate, removeCandidate, voteCandidate };
