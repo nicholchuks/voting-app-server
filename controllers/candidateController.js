@@ -83,7 +83,13 @@ const addCandidate = async (req, res, next) => {
 // GET : api/elections/:id
 // PROTECTED
 const getCandidate = async (req, res, next) => {
-  res.json("Get candidate");
+  try {
+    const { id } = req.params;
+    const candidate = await CandidateModel.findById(id);
+    res.json(candidate);
+  } catch (error) {
+    return next(new HttpError(error));
+  }
 };
 
 // ......................DELETE CANDIDATE.....................
