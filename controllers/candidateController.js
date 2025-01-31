@@ -96,7 +96,53 @@ const getCandidate = async (req, res, next) => {
 // GET : api/elections/:id
 // PROTECTED (Oly admin)
 const removeCandidate = async (req, res, next) => {
-  res.json("Delete candidate");
+  try {
+    //Only admin can add election
+    if (!req.user.isAdmin) {
+      return next(new HttpError("Only an admin can perform this action.", 403));
+    }
+
+    const { id } = req.params;
+    let currentCandidate = await CandidateModel.findById(id).populate(
+      "election"
+    );
+    // console.log("Election Data:", currentCandidate.election);
+
+    // Ensure election is an object, not an array
+    const election = Array.isArray(currentCandidate.election)
+      ? currentCandidate.election[0]
+      : currentCandidate.election;
+
+    if (!election) {
+      return next(new HttpError("Election data not found.", 422));
+    }
+
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await currentCandidate.deleteOne({ session: sess });
+
+    // Modify the election's candidates array
+    election.candidates.pull(currentCandidate._id);
+    await election.save({ session: sess });
+
+    await sess.commitTransaction();
+
+    res.status(200).json("Candidate deleted successfully");
+    // if (!currentCandidate) {
+    //   return next(new HttpError("Couldn't delete candidate.", 422));
+    // } else {
+    //   const sess = await mongoose.startSession();
+    //   sess.startTransaction();
+    //   await currentCandidate.deleteOne({ session: sess });
+    //   currentCandidate.election.candidates.pull(currentCandidate);
+    //   await currentCandidate.election.save({ session: sess });
+    //   await sess.commitTransaction();
+
+    //   res.status(200).json("Candidate deleted successfully");
+    // }
+  } catch (error) {
+    return next(new HttpError(error));
+  }
 };
 
 // ......................VOTE.....................
