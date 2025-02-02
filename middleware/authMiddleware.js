@@ -15,8 +15,7 @@ const authMiddleware = async (req, res, next) => {
       next();
     });
   } else {
-    return next(new HttpError("unauthorized. No token", 403));
+    return next(new HttpError("Anauthorized. No token", 403));
   }
 };
-
 module.exports = authMiddleware;
