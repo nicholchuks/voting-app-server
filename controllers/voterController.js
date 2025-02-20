@@ -4,7 +4,6 @@ const HttpError = require("../models/ErrorModel");
 // const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const voterModel = require("../models/voterModel");
 
 // ......................REGISTER NEW VOTER.....................
 // POST : api/voters/register

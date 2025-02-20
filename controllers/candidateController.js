@@ -73,7 +73,12 @@ const addCandidate = async (req, res, next) => {
       await election.save({ session: sess });
       await sess.commitTransaction();
 
-      res.status(201).json("Candidate added successfully.");
+      // res.status(201).json(voter.votedElections);
+      res.status(201).json({
+        message: "Candidate added successfully",
+        candidate: newCandidate,
+        election: election._id,
+      });
     });
   } catch (error) {
     return next(new HttpError(error));
