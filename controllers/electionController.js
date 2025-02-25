@@ -14,9 +14,9 @@ require("dotenv").config();
 const addElection = async (req, res, next) => {
   try {
     //Only admin can add election
-      if(!req.user.isAdmin) {
-       return next(new HttpError("Only an admin can perform this action.", 403))
-     }
+    if (!req.user.isAdmin) {
+      return next(new HttpError("Only an admin can perform this action.", 403));
+    }
 
     const { title, description } = req.body;
     if (!title || !description) {
@@ -129,9 +129,9 @@ const getElectionVoters = async (req, res, next) => {
 const updateElection = async (req, res, next) => {
   try {
     //Only admin can add election
-      if(!req.user.isAdmin) {
-       return next(new HttpError("Only an admin can perform this action.", 403))
-     }
+    if (!req.user.isAdmin) {
+      return next(new HttpError("Only an admin can perform this action.", 403));
+    }
     const { id } = req.params;
     const { title, description } = req.body;
     if (!title || !description) {
@@ -190,9 +190,9 @@ const updateElection = async (req, res, next) => {
 const removeElection = async (req, res, next) => {
   try {
     //Only admin can add election
-      if(!req.user.isAdmin) {
-       return next(new HttpError("Only an admin can perform this action.", 403))
-     }
+    if (!req.user.isAdmin) {
+      return next(new HttpError("Only an admin can perform this action.", 403));
+    }
     const { id } = req.params;
     await ElectionModel.findByIdAndDelete(id);
     //delete candidates that belong to this election
